@@ -1,5 +1,7 @@
 package com.example.trendingapp.network;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 
 import java.io.Serializable;
@@ -23,6 +25,7 @@ public class BaseResponse implements Serializable {
         this.responseStatus = responseStatus;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return new Gson().toJson(this);
@@ -65,6 +68,7 @@ public class BaseResponse implements Serializable {
             this.code = code;
         }
 
+        @NonNull
         @Override
         public String toString() {
             return new Gson().toJson(this);

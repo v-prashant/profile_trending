@@ -15,7 +15,17 @@ fun <T> MutableLiveData<Resource<T>>.setSuccess(data: T) {
                 )
             )
         } else {
-            setError(data = data)
+            // for now commenting this because there is no success or error response' status
+       //     setError(data = data)
+
+            // adding this for above issue
+            postValue(
+                Resource(
+                    Status.SUCCESS,
+                    data
+                )
+            )
+
         }
     }
 }

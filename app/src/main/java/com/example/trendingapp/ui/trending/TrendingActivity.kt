@@ -1,10 +1,11 @@
 package com.example.trendingapp.ui.trending
 
 import android.os.Bundle
-import android.view.View
 import com.example.trendingapp.R
+import com.example.trendingapp.api.Status
 import com.example.trendingapp.base.BaseActivity
 import com.example.trendingapp.databinding.ActivityTrendingBinding
+import com.example.trendingapp.network.response.GetRepositoriesResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -13,10 +14,14 @@ class TrendingActivity : BaseActivity<TrendingVM, ActivityTrendingBinding>() {
     var dataList = ArrayList<TrendingItems>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initData()
-        initViews()
         observeData()
+        initViews()
+        callRepositoriesApi()
         onClickListener()
+    }
+
+    private fun callRepositoriesApi() {
+         viewModel.getRepositories()
     }
 
     private fun onClickListener() {
@@ -29,26 +34,42 @@ class TrendingActivity : BaseActivity<TrendingVM, ActivityTrendingBinding>() {
 
     }
 
-    private fun initData() {
-        dataList.add(TrendingItems(null, "Prashant", "Android Developer", "I am Prashant Verma hji nin kmlknk hnjnfr", "Kotlin", "150", "1500"))
-        dataList.add(TrendingItems(null, "Bikki", "Backend Developer", "I am Bikki Verma", "Java", "10", "1100"))
-        dataList.add(TrendingItems(null, "Honey", "Android Developer", "I am Honey Verma", "Python", "110", "1300"))
-        dataList.add(TrendingItems(null, "Tushar", "Backend Developer", "I am Tushar Verma", "C++", "130", "1200"))
-    }
-
     private fun observeData() {
-//        viewModel.getTrendingLiveData.observeLiveData {
-//            getTrendingResponse()
-//            hideProgress()
-//        }
+        viewModel.getRepositoriesLiveData.observe(this){
+            when(it.status){
+                Status.LOADING->{
+                    showProgress()
+                }
+                Status.SUCCESS->{
+                    getRepositoriesResponse(it.data)
+                    hideProgress()
+                }
+                Status.ERROR->{
+                    showErrorMessage(it.data.toString())
+                    hideProgress()
+                }
+                Status.THROWABLE -> {
+                    val errorBody = it.throwable
+                    showErrorMessage(errorBody?.message.toString())
+                    hideProgress()
+                }
+            }
+        }
     }
 
-    private fun getTrendingResponse() {
+    private fun getRepositoriesResponse(res: GetRepositoriesResponse?) {
+        dataList.clear()
+
+        if(res?.items != null)
+            for(item in res.items!!)
+                dataList.add(TrendingItems(null, item.name, item.htmlUrl, item.description, item.language, item.watchersCount, item.forksCount))
+
+        binding.rvTrendingList.adapter = TrendingAdapter(this, dataList)
 
     }
 
     private fun initViews() {
-        binding.rvTrendingList.adapter = TrendingAdapter(this, dataList)
+
     }
 
     override val layoutId: Int

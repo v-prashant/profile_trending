@@ -1,13 +1,15 @@
 package com.example.trendingapp.api
 
+import com.example.trendingapp.network.response.GetRepositoriesResponse
+import com.example.trendingapp.utils.AppConstant.REPOSITORIES
 import io.reactivex.Single
-import retrofit2.http.Body
-import retrofit2.http.POST
+import retrofit2.http.GET
+import retrofit2.http.Query
 
 
 interface APIService {
 
-//    @POST(GET_ENCRYPTION_KEY)
-//    fun getEncryptionKey(@Body request: GetEncryptionKeyRequest): Single<GetEncryptionKeyResponse>
+    @GET(REPOSITORIES)
+    fun getRepositories(@Query("q") q: String, @Query("per_page") perPage: String): Single<GetRepositoriesResponse>
 
 }
