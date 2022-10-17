@@ -91,6 +91,11 @@ dependencies {
     // circular image view
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
+    // for skelton loading
+    implementation 'com.facebook.shimmer:shimmer:0.1.0@aar'
+
+    // swipe down to refresh
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
 }
 
