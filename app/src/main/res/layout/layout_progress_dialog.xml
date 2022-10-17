@@ -5,12 +5,12 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/transparent"
-    android:padding="16dp">
+    android:padding="@dimen/dp_16">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/progress_bar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="@dimen/dp_48"
+        android:layout_height="@dimen/dp_48"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -19,9 +19,9 @@
         android:id="@+id/loadingMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/dp_8"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="@dimen/sp_16"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@id/progress_bar"
         app:layout_constraintStart_toStartOf="@id/progress_bar"
