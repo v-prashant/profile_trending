@@ -2,29 +2,45 @@ package com.example.trendingapp.ui.trending
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import com.example.trendingapp.R
 import com.example.trendingapp.api.Status
 import com.example.trendingapp.base.BaseActivity
 import com.example.trendingapp.databinding.ActivityTrendingBinding
 import com.example.trendingapp.network.response.GetRepositoriesResponse
+import com.example.trendingapp.utils.SharedPreferenceUtil
+import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
+
+const val EXPIRE_TIME_STAMP = 7200000
 
 @AndroidEntryPoint
 class TrendingActivity : BaseActivity<TrendingVM, ActivityTrendingBinding>() {
 
-  //  var skeletonScreen = Sk
     var dataList = ArrayList<TrendingItems>()
+    var storedTime:Long = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setCacheSystem()
         observeData()
         initViews()
         callRepositoriesApi()
         onClickListener()
     }
 
+    private fun setCacheSystem() {
+        val localList = SharedPreferenceUtil.getSharedPrefObject(this, SharedPreferenceUtil.TRENDING_DATA, object : TypeToken<ArrayList<TrendingItems>>() {} )
+        storedTime = SharedPreferenceUtil.getLongSharedPreference(this, SharedPreferenceUtil.TRENDING_DATA_TS)
+        if(localList != null){
+            dataList = localList
+        }
+    }
+
     private fun callRepositoriesApi() {
-         viewModel.getRepositories()
+        // dataList will be empty in case of user opening first time app or user has cleared data.
+        if(dataList.isEmpty() || (System.currentTimeMillis() - storedTime) > EXPIRE_TIME_STAMP)
+            viewModel.getRepositories()
+        else
+            binding.rvTrendingList.adapter = TrendingAdapter(this, dataList)
     }
 
     private fun onClickListener() {
@@ -101,6 +117,9 @@ class TrendingActivity : BaseActivity<TrendingVM, ActivityTrendingBinding>() {
         if(res?.items != null)
             for(item in res.items!!)
                 dataList.add(TrendingItems(null, item.name, item.htmlUrl, item.description, item.language, item.watchersCount, item.forksCount))
+
+        SharedPreferenceUtil.setSharedPrefObject(this, SharedPreferenceUtil.TRENDING_DATA, dataList)
+        SharedPreferenceUtil.setSharedPreference(this, SharedPreferenceUtil.TRENDING_DATA_TS, System.currentTimeMillis())
 
         binding.rvTrendingList.adapter = TrendingAdapter(this, dataList)
     }

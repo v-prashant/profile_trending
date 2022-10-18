@@ -3,9 +3,16 @@ package com.example.trendingapp.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.widget.ArrayAdapter;
+
+import com.example.trendingapp.ui.trending.TrendingItems;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 import com.securepreferences.SecurePreferences;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Set;
 
 public final class SharedPreferenceUtil {
@@ -16,6 +23,8 @@ public final class SharedPreferenceUtil {
     public static final String AUTHORIZATION_TOKEN = "AUTHORIZATION_TOKEN";
     public static final String LOCATION_LATITUDE = "LATITUDE";
     public static final String LOCATION_LONGITUDE = "LONGITUDE";
+    public static final String TRENDING_DATA = "TRENDING_DATA";
+    public static final String TRENDING_DATA_TS = "TRENDING_DATA_TS";
 
     // Util functions
     private static SharedPreferences preferences;
@@ -57,8 +66,22 @@ public final class SharedPreferenceUtil {
         return getPreferences(context).getStringSet(key, null);
     }
 
+    public static <T> ArrayList<T> getSharedPrefObject(Context context, String key, TypeToken<ArrayList<T>> value){
+        Gson gson = new Gson();
+        SharedPreferences mPrefs = getPreferences(context);
+        String json = mPrefs.getString(key, "");
+        return gson.fromJson(json, value.getType());
+    }
 
     // Setters
+    public static <T> void setSharedPrefObject(Context context, String key, ArrayList<T> value){
+        SharedPreferences.Editor edit = getPreferences(context).edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(value);
+        edit.putString(key, json);
+        edit.apply();
+    }
+
     public static void setSharedPreference(Context context, String key, String value) {
         SharedPreferences.Editor edit = getPreferences(context).edit();
         edit.putString(key, value);
@@ -96,27 +119,10 @@ public final class SharedPreferenceUtil {
     }
 
     public static void remove(Context context, String key) {
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor prefsEditor = mPrefs.edit();
-        prefsEditor.remove(key);
-        prefsEditor.apply();
+        SharedPreferences.Editor edit = getPreferences(context).edit();
+        edit.remove(key);
+        edit.apply();
     }
 
-    public static void setSharedPrefObject(Context context, Object object){
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor prefsEditor = mPrefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(object);
-        prefsEditor.putString("customer_details", json);
-        prefsEditor.apply();
-    }
 
-    //Existing SharedPreferenceUtil does not work for remove hence this
-    public static void removeAppPermissions(String key, Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.remove(key);
-        editor.clear();
-        editor.apply();
-    }
 }
